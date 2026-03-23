@@ -1,0 +1,45 @@
+{
+  "app": {
+    "name": "GroundTruth",
+    "tagline": "Solana's Agroclimatic Oracle",
+    "description": "DePIN network of verifiable field data for EUDR compliance and DeSci"
+  },
+  "nav": {
+    "overview": "Farm Overview",
+    "telemetry": "Telemetry",
+    "eudr": "EUDR Compliance",
+    "desci": "DeSci Marketplace"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "failed": "Failed",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "sensor": {
+    "temperature": "Temperature",
+    "humidity": "Humidity",
+    "pressure": "Pressure",
+    "soil_moisture": "Soil Moisture",
+    "light": "Light",
+    "co2": "CO₂",
+    "battery": "Battery",
+    "rssi": "Signal",
+    "uptime": "Uptime"
+  },
+  "actions": {
+    "simulate": "Simulate ESP32 Reading",
+    "refresh": "Refresh",
+    "generate_report": "Generate PDF Report",
+    "request_access": "Request Access",
+    "view_on_chain": "View on Solana Explorer"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Connection error with the server.",
+    "not_found": "Resource not found."
+  }
+}

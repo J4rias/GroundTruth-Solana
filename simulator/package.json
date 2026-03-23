@@ -1,0 +1,19 @@
+{
+  "name": "@groundtruth/simulator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch esp32-mock.ts",
+    "start": "tsx esp32-mock.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@groundtruth/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.20",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}

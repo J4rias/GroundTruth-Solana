@@ -1,0 +1,87 @@
+// ── GroundTruth — Prisma Schema ───────────────────────────────────────────────
+// Target: Supabase PostgreSQL
+// Run: pnpm prisma migrate dev  (creates tables in Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Farm ──────────────────────────────────────────────────────────────────────
+
+model Farm {
+  id           String     @id @default(uuid())
+  name         String
+  location     String
+  owner_pubkey String
+  farm_pubkey  String?    @unique // Solana PDA — set after initialize_farm
+  is_active    Boolean    @default(true)
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+
+  nodes    FarmNode[]
+  readings SensorReading[]
+
+  @@map("farms")
+}
+
+// ── FarmNode ──────────────────────────────────────────────────────────────────
+
+model FarmNode {
+  id          String    @id @default(uuid())
+  node_id     String    @unique // e.g. "GT-NODE-001"
+  farm_id     String
+  node_pubkey String?   @unique // Solana PDA — set after register_node
+  is_active   Boolean   @default(true)
+  last_seen   DateTime?
+  battery_mv  Int?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  farm     Farm            @relation(fields: [farm_id], references: [id])
+  readings SensorReading[]
+
+  @@map("farm_nodes")
+}
+
+// ── SensorReading ─────────────────────────────────────────────────────────────
+
+enum ReadingStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+model SensorReading {
+  id                String        @id @default(uuid())
+  node_id           String
+  farm_id           String
+  sequence          Int
+  temperature_c     Float
+  humidity_pct      Float
+  pressure_hpa      Float
+  soil_moisture_pct Float
+  light_lux         Float
+  co2_ppm           Float
+  battery_mv        Int
+  rssi_dbm          Int
+  uptime_seconds    Int
+  data_hash         String
+  status            ReadingStatus @default(PENDING)
+  tx_signature      String?
+  pda_address       String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  node FarmNode @relation(fields: [node_id], references: [node_id])
+  farm Farm     @relation(fields: [farm_id], references: [id])
+
+  @@index([farm_id, created_at])
+  @@index([node_id, created_at])
+  @@index([status])
+  @@map("sensor_readings")
+}

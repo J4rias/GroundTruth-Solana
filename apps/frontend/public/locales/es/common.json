@@ -1,0 +1,45 @@
+{
+  "app": {
+    "name": "GroundTruth",
+    "tagline": "El oráculo agroclimático de Solana",
+    "description": "Red DePIN de datos verificables del campo para EUDR y DeSci"
+  },
+  "nav": {
+    "overview": "Vista General",
+    "telemetry": "Telemetría",
+    "eudr": "Cumplimiento EUDR",
+    "desci": "Mercado DeSci"
+  },
+  "status": {
+    "online": "En línea",
+    "offline": "Sin conexión",
+    "pending": "Pendiente",
+    "confirmed": "Confirmado",
+    "failed": "Fallido",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "sensor": {
+    "temperature": "Temperatura",
+    "humidity": "Humedad",
+    "pressure": "Presión",
+    "soil_moisture": "Humedad del suelo",
+    "light": "Luz",
+    "co2": "CO₂",
+    "battery": "Batería",
+    "rssi": "Señal",
+    "uptime": "Tiempo activo"
+  },
+  "actions": {
+    "simulate": "Simular lectura ESP32",
+    "refresh": "Actualizar",
+    "generate_report": "Generar reporte PDF",
+    "request_access": "Solicitar acceso",
+    "view_on_chain": "Ver en Solana Explorer"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Intenta de nuevo.",
+    "network": "Error de conexión con el servidor.",
+    "not_found": "Recurso no encontrado."
+  }
+}

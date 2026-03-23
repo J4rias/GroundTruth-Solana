@@ -1,0 +1,42 @@
+{
+  "name": "groundtruth",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DePIN IoT Oracle for Solana — Hackathon LATAM 2026",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --parallel --filter '@groundtruth/backend' --filter '@groundtruth/frontend' dev",
+    "dev:backend": "pnpm --filter @groundtruth/backend dev",
+    "dev:frontend": "pnpm --filter @groundtruth/frontend dev",
+    "dev:simulator": "pnpm --filter @groundtruth/simulator dev",
+    "dev:all": "pnpm --parallel -r dev",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "types:build": "pnpm --filter @groundtruth/types build",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/J4rias/GroundTruth-Solana.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/J4rias/GroundTruth-Solana/issues"
+  },
+  "homepage": "https://github.com/J4rias/GroundTruth-Solana#readme",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4"
+  }
+}
