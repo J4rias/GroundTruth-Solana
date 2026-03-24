@@ -13,6 +13,41 @@
   --color-base-content: oklch(88% 0.02 240);
 }
 
+/* ── Print / PDF (EUDR Report) ──────────────────────────────────────────── */
+@media print {
+  @page { margin: 2cm; size: A4; }
+  /* Reset theme — force light colors everywhere */
+  [data-theme='groundtruth'] {
+    --color-base-100: #fff;
+    --color-base-200: #fff;
+    --color-base-300: #fff;
+    --color-base-content: #222;
+  }
+  html, body { background: white !important; color: #222 !important; margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-shadow: none !important; outline: none !important; }
+  /* Hide sidebar + screen-only elements */
+  nav, aside, header, .print\:hidden { display: none !important; }
+  /* Remove sidebar margin on main */
+  main { margin-left: 0 !important; }
+  /* All backgrounds white, remove borders by default */
+  div, section, article, main { background: white !important; border: none !important; }
+  /* Cards & alerts keep light borders */
+  .card { border: 1px solid #ddd !important; background: white !important; break-inside: avoid; padding: 12px; }
+  .alert { border: 2px solid #999 !important; background: white !important; color: #222 !important; padding: 12px; }
+  .alert-success { border-color: #16a34a !important; }
+  .alert-warning { border-color: #ca8a04 !important; }
+  .alert-error   { border-color: #dc2626 !important; }
+  .badge-success { background: #16a34a !important; color: white !important; }
+  .badge-error   { background: #dc2626 !important; color: white !important; }
+  a { color: #222 !important; text-decoration: none; }
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin: 8px 0; }
+  th, td { border: 1px solid #ccc !important; padding: 6px 8px; text-align: left; background: white !important; color: #222 !important; }
+  th { background: #e5e5e5 !important; color: #000 !important; font-weight: 600; }
+  .progress { display: none !important; }
+  h1, h2, h3, p, span { color: #222 !important; }
+}
+
 /* ── Smooth scrolling ───────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;

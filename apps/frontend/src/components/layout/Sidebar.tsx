@@ -23,14 +23,21 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-60 min-h-screen bg-base-200 border-r border-base-300 flex flex-col">
+    <aside className="w-60 h-screen fixed left-0 top-0 bg-base-200 border-r border-base-300 flex flex-col overflow-y-auto">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-base-300">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🌿</span>
+          <img
+            src="/groundtruth-logo.png"
+            alt="GroundTruth"
+            className="w-10 h-10 object-contain"
+          />
           <div>
-            <p className="font-bold text-primary text-sm leading-tight">GroundTruth</p>
-            <p className="text-xs text-base-content/50">DePIN · Solana</p>
+            <p className="font-bold text-sm leading-tight drop-shadow-md">
+              <span className="text-secondary">Ground</span>
+              <span className="text-primary">Truth</span>
+            </p>
+            <p className="text-xs text-base-content/50">Agricultural Compliance</p>
           </div>
         </div>
       </div>

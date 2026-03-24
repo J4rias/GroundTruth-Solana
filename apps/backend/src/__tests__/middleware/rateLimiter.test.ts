@@ -26,26 +26,26 @@ describe('middleware/rateLimiter', () => {
     await expect(rateLimitByNodeId(mockFastify, 'GT-NODE-001')).resolves.not.toThrow();
   });
 
-  it('allows exactly 5 requests (the 5th request should succeed)', async () => {
+  it('allows exactly 30 requests (the 30th request should succeed)', async () => {
     const mockPipeline = {
       zremrangebyscore: vi.fn().mockReturnThis(),
       zadd: vi.fn().mockReturnThis(),
       zcard: vi.fn().mockReturnThis(),
       expire: vi.fn().mockReturnThis(),
-      exec: vi.fn().mockResolvedValue([null, null, [null, 5], null]), // zcard returns [null, 5]
+      exec: vi.fn().mockResolvedValue([null, null, [null, 30], null]), // zcard returns [null, 30]
     };
     mockFastify.redis.pipeline.mockReturnValue(mockPipeline);
 
     await expect(rateLimitByNodeId(mockFastify, 'GT-NODE-001')).resolves.not.toThrow();
   });
 
-  it('rejects 6th request (exceeds limit)', async () => {
+  it('rejects 31st request (exceeds 30 limit)', async () => {
     const mockPipeline = {
       zremrangebyscore: vi.fn().mockReturnThis(),
       zadd: vi.fn().mockReturnThis(),
       zcard: vi.fn().mockReturnThis(),
       expire: vi.fn().mockReturnThis(),
-      exec: vi.fn().mockResolvedValue([null, null, [null, 6], null]), // zcard returns [null, 6] > 5
+      exec: vi.fn().mockResolvedValue([null, null, [null, 31], null]), // zcard returns [null, 31] > 30
     };
     mockFastify.redis.pipeline.mockReturnValue(mockPipeline);
 

@@ -1,5 +1,6 @@
-import { Connection, PublicKey, type ConfirmOptions } from '@solana/web3.js';
+import { Connection, PublicKey, SystemProgram, type ConfirmOptions } from '@solana/web3.js';
 import { AnchorProvider, Program, setProvider, type Idl } from '@coral-xyz/anchor';
+import BN from 'bn.js';
 import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -42,8 +43,7 @@ function getProgram(): Program {
   setProvider(provider);
 
   const idl = loadIdl();
-  const programId = new PublicKey(env.GROUNDTRUTH_PROGRAM_ID);
-  _program = new Program(idl, programId, provider);
+  _program = new Program(idl, provider);
 
   logger.info('Anchor program loaded', { programId: env.GROUNDTRUTH_PROGRAM_ID });
   return _program;
@@ -92,14 +92,14 @@ export async function certifyReading(params: {
         toX10(params.temperatureC),
         toX10(params.humidityPct),
         toX10(params.pressureHpa),
-        { toNumber: () => timestampSec }, // BN-compatible
+        new BN(timestampSec),
       )
       .accounts({
-        reading_cert: certPda,
-        farm_account: farmPubkey,
-        node_account: nodePda,
+        readingCert: certPda,
+        farmAccount: farmPubkey,
+        nodeAccount: nodePda,
         authority: keypair.publicKey,
-        system_program: PublicKey.default,
+        systemProgram: SystemProgram.programId,
       })
       .rpc({ commitment: 'confirmed' }) as string;
 

@@ -13,7 +13,7 @@ import { TelemetryChart } from '../components/charts/TelemetryChart.js';
 import { ComplianceGauge } from '../components/charts/ComplianceGauge.js';
 
 // For demo: use the seeded farm ID from seed.ts
-const DEMO_FARM_ID = '1';
+const DEMO_FARM_ID = '02d1a1f4-7da1-4b6c-a39c-f9826532b47f';
 
 const EXPLORER_BASE = 'https://explorer.solana.com/tx';
 
@@ -29,27 +29,31 @@ export function FarmOverview() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    const fetchAll = (isInitial = false) => {
+      if (isInitial) { setLoading(true); setError(null); }
+      Promise.all([
+        farmsApi.getById(DEMO_FARM_ID),
+        farmsApi.getNodes(DEMO_FARM_ID),
+        farmsApi.getOverview(DEMO_FARM_ID),
+        complianceApi.getScore(DEMO_FARM_ID),
+        readingsApi.list(DEMO_FARM_ID, 1, 20),
+      ])
+        .then(([farmData, nodesData, overviewData, scoreData, readingsData]) => {
+          setFarm(farmData);
+          setNodes(nodesData);
+          setOverview(overviewData);
+          setScore(scoreData);
+          setReadings(readingsData.data);
+        })
+        .catch((err: unknown) => {
+          if (isInitial) setError(err instanceof Error ? err.message : t('errors.generic'));
+        })
+        .finally(() => { if (isInitial) setLoading(false); });
+    };
 
-    Promise.all([
-      farmsApi.getById(DEMO_FARM_ID),
-      farmsApi.getNodes(DEMO_FARM_ID),
-      farmsApi.getOverview(DEMO_FARM_ID),
-      complianceApi.getScore(DEMO_FARM_ID),
-      readingsApi.list(DEMO_FARM_ID, 1, 20),
-    ])
-      .then(([farmData, nodesData, overviewData, scoreData, readingsData]) => {
-        setFarm(farmData);
-        setNodes(nodesData);
-        setOverview(overviewData);
-        setScore(scoreData);
-        setReadings(readingsData.data);
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : t('errors.generic'));
-      })
-      .finally(() => setLoading(false));
+    fetchAll(true);
+    const interval = setInterval(() => fetchAll(false), 8000);
+    return () => clearInterval(interval);
   }, [t]);
 
   if (loading) return <Spinner size="lg" />;

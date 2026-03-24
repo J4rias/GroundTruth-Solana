@@ -7,7 +7,7 @@ import { Spinner } from '../components/ui/Spinner.js';
 import { ErrorAlert } from '../components/ui/ErrorAlert.js';
 import { TelemetryChart } from '../components/charts/TelemetryChart.js';
 
-const DEMO_FARM_ID = '1';
+const DEMO_FARM_ID = '02d1a1f4-7da1-4b6c-a39c-f9826532b47f';
 const PAGE_SIZE = 20;
 
 export function Telemetry() {
@@ -18,12 +18,17 @@ export function Telemetry() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    readingsApi
-      .list(DEMO_FARM_ID, page, PAGE_SIZE)
-      .then(setResult)
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : t('errors.generic')))
-      .finally(() => setLoading(false));
+    const loadData = (isInitial = false) => {
+      if (isInitial) { setLoading(true); setError(null); }
+      readingsApi
+        .list(DEMO_FARM_ID, page, PAGE_SIZE)
+        .then(setResult)
+        .catch((err: unknown) => { if (isInitial) setError(err instanceof Error ? err.message : t('errors.generic')); })
+        .finally(() => { if (isInitial) setLoading(false); });
+    };
+    loadData(true);
+    const interval = setInterval(() => loadData(false), 8000);
+    return () => clearInterval(interval);
   }, [page, t]);
 
   if (loading) return <Spinner size="lg" />;

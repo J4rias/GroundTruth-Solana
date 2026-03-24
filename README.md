@@ -1,4 +1,4 @@
-# GroundTruth — DePIN IoT Oracle on Solana
+# GroundTruth — Agricultural Compliance on Solana
 
 > **Solana LATAM Hackathon 2026**
 
@@ -6,92 +6,190 @@
 
 ## 🇪🇸 Español
 
+### ¿Qué es GroundTruth?
+
 **GroundTruth** es una red DePIN (Decentralized Physical Infrastructure) en Solana que convierte nodos IoT de bajo costo en oráculos de datos agroclimáticos verificables.
 
-Cada lectura de sensor genera un certificado criptográfico on-chain. Los agricultores poseen sus datos. Los modelos de IA y los reguladores (EUDR) los consumen.
+Cada lectura de sensor genera un certificado criptográfico on-chain. Los agricultores poseen sus datos. Los modelos de IA y reguladores (EUDR) los consumen directamente sin intermediarios.
 
 > *"El mundo tiene satélites y modelos de IA. Le falta el ground truth real del campo."*
 
-### Stack
+### ¿Qué hace?
 
-| Capa | Tecnología |
+- **Recolecta datos:** IoT sensors miden temperatura, humedad, presión en tiempo real
+- **Certifica on-chain:** Cada lectura genera un hash SHA-256 y se registra en Solana como prueba inmutable
+- **Verifica cumplimiento EUDR:** Calcula automáticamente si la finca cumple regulaciones de deforestación
+- **Marketplace de datos:** Investigadores compran acceso a datasets históricos certificados en Solana
+- **Dashboard:** Visualiza métricas en tiempo real, reportes de cumplimiento y transacciones Solana
+
+### Cómo iniciarlo
+
+#### Requisitos previos
+- Node.js 18+
+- pnpm
+- Docker (para Redis)
+- Anchor CLI (para Solana)
+- Credenciales de Supabase
+
+#### Pasos
+
+```bash
+# 1. Clonar y configurar variables de entorno
+cp .env.example .env
+# Edita .env con tus credenciales de Supabase y Solana RPC
+
+# 2. Instalar dependencias
+pnpm install
+
+# 3. Construir tipos compartidos
+pnpm --filter @groundtruth/types build
+
+# 4. Iniciar Redis en Docker
+docker compose up -d
+
+# 5. Iniciar backend (puerto 3001)
+pnpm --filter @groundtruth/backend dev
+
+# 6. Iniciar frontend (puerto 5173)
+pnpm --filter @groundtruth/frontend dev
+
+# 7. Ejecutar simulador (opcional)
+pnpm --filter @groundtruth/simulator dev
+```
+
+### Stack tecnológico
+
+| Componente | Tecnología |
 |---|---|
-| Smart Contract | Anchor (Rust) · Solana devnet |
-| Backend | Fastify + TypeScript + Prisma + Redis |
-| Base de datos | Supabase (PostgreSQL hosted) |
-| Frontend | React + Vite + DaisyUI + Recharts + i18n |
-| Tipos compartidos | `@groundtruth/types` (pnpm workspaces) |
-| Simulator | Node.js — modo demo (8s) / producción (5min) |
+| Smart Contract | Anchor (Rust) — Solana Devnet |
+| Backend API | Fastify + TypeScript |
+| Base de datos | Supabase (PostgreSQL) |
+| Cache | Redis |
+| Frontend | React + Vite + DaisyUI + Recharts |
+| Tipos compartidos | pnpm workspaces |
+| Testing | Vitest (33 tests passing) |
+
+### Estructura del proyecto
+
+```
+groundtruth/
+├── apps/
+│   ├── backend/        ← API REST (Fastify, port 3001)
+│   └── frontend/       ← Dashboard React (Vite, port 5173)
+├── packages/
+│   └── types/          ← @groundtruth/types (interfaces compartidas)
+├── programs/           ← Anchor program (Rust)
+├── simulator/          ← Simulador IoT (ESP32 mock)
+└── docker-compose.yml  ← Redis
+```
+
+### Páginas del dashboard
+
+- **`/`** — Overview: métricas de la finca, gráfico climático, estado de nodos
+- **`/telemetry`** — Tabla en tiempo real con datos de sensores y links a Solana Explorer
+- **`/eudr`** — Reporte de cumplimiento EUDR con prueba de integridad on-chain
+- **`/desci`** — Marketplace de datos (datasets certificados disponibles)
 
 ---
 
 ## 🇺🇸 English
 
+### What is GroundTruth?
+
 **GroundTruth** is a DePIN (Decentralized Physical Infrastructure) network on Solana that turns low-cost IoT nodes into verifiable agroclimatic data oracles.
 
-Each sensor reading generates a cryptographic certificate on-chain. Farmers own their data. AI models and regulators (EUDR) consume it.
+Each sensor reading generates a cryptographic certificate on-chain. Farmers own their data. AI models and regulators (EUDR) consume it directly without intermediaries.
 
 > *"The world has satellites and AI models. It lacks real ground truth from the field."*
 
-### Data Flow
+### What does it do?
 
+- **Collects data:** IoT sensors measure temperature, humidity, pressure in real-time
+- **Certifies on-chain:** Each reading generates a SHA-256 hash and is registered on Solana as immutable proof
+- **Verifies EUDR compliance:** Automatically calculates if a farm meets deforestation regulations
+- **Data marketplace:** Researchers purchase access to historical certified datasets on Solana
+- **Dashboard:** Visualize real-time metrics, compliance reports, and Solana transactions
+
+### How to start
+
+#### Prerequisites
+- Node.js 18+
+- pnpm
+- Docker (for Redis)
+- Anchor CLI (for Solana)
+- Supabase credentials
+
+#### Steps
+
+```bash
+# 1. Clone and configure environment variables
+cp .env.example .env
+# Edit .env with your Supabase and Solana RPC credentials
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Build shared types
+pnpm --filter @groundtruth/types build
+
+# 4. Start Redis in Docker
+docker compose up -d
+
+# 5. Start backend (port 3001)
+pnpm --filter @groundtruth/backend dev
+
+# 6. Start frontend (port 5173)
+pnpm --filter @groundtruth/frontend dev
+
+# 7. Run simulator (optional)
+pnpm --filter @groundtruth/simulator dev
 ```
-[ESP32 Simulator]
-  │  POST /api/hardware/ingest
-  ▼
-[Fastify Backend]
-  ├── Redis rate limit (5 req/min per node)
-  ├── Zod validation + SHA-256 chain-of-custody
-  ├── Prisma → Supabase PostgreSQL
-  └── Anchor → certify_reading() on-chain
-        ↓
-[Solana Devnet]  ReadingCertificate PDA with data_hash
-```
 
-### Anchor Program — 3 Instructions · 3 PDAs
+### Technology stack
 
-| Instruction | PDA Seeds | Description |
-|---|---|---|
-| `initialize_farm` | `["farm", owner]` | Creates FarmAccount |
-| `register_node` | `["node", node_id, farm]` | Creates NodeAccount |
-| `certify_reading` | `["cert", node, timestamp]` | Creates ReadingCertificate + EUDR compliance score in Rust |
+| Component | Technology |
+|---|---|
+| Smart Contract | Anchor (Rust) — Solana Devnet |
+| Backend API | Fastify + TypeScript |
+| Database | Supabase (PostgreSQL) |
+| Cache | Redis |
+| Frontend | React + Vite + DaisyUI + Recharts |
+| Shared types | pnpm workspaces |
+| Testing | Vitest (33 tests passing) |
 
-### Repository Structure
+### Project structure
 
 ```
 groundtruth/
 ├── apps/
-│   ├── backend/        ← Fastify API (port 3001)
-│   └── frontend/       ← React + Vite SPA (port 5173)
+│   ├── backend/        ← REST API (Fastify, port 3001)
+│   └── frontend/       ← React Dashboard (Vite, port 5173)
 ├── packages/
 │   └── types/          ← @groundtruth/types (shared interfaces)
 ├── programs/           ← Anchor program (Rust)
-├── simulator/          ← ESP32 mock — 9 sensor fields
-└── docker-compose.yml  ← Redis only (PostgreSQL on Supabase)
+├── simulator/          ← IoT simulator (ESP32 mock)
+└── docker-compose.yml  ← Redis
 ```
 
-### Dashboard Pages
+### Dashboard pages
 
-- `/` — Farm Overview: stat cards + climate chart + node status
-- `/telemetry` — Real-time table with Solana Explorer TX links
-- `/eudr` — EUDR Compliance Report with Solana proof chain
-- `/desci` — DeSci Data Marketplace (datasets available on-chain)
+- **`/`** — Overview: farm metrics, climate chart, node status
+- **`/telemetry`** — Real-time table with sensor data and Solana Explorer links
+- **`/eudr`** — EUDR compliance report with on-chain integrity proof
+- **`/desci`** — Data marketplace (certified datasets available)
 
 ---
 
-## Setup
+## Testing
+
+Run the test suite (33 tests across 7 modules):
 
 ```bash
-# Prerequisites: Node.js, pnpm, Anchor CLI, Solana CLI, Docker
-cp .env.example .env  # fill in Supabase + Solana credentials
-
-docker compose up -d  # start Redis
-
-pnpm install
-pnpm --filter @groundtruth/types build
-pnpm --filter backend dev
-pnpm --filter frontend dev
+pnpm --filter @groundtruth/backend test
+pnpm --filter @groundtruth/backend test:coverage  # see coverage %
 ```
+
+---
 
 ## License
 

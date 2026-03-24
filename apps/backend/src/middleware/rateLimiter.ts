@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify';
 import { AppError, ErrorCode } from '@groundtruth/types';
 import { logger } from '../config/logger.js';
 
-// Sliding window: 5 requests per 60 seconds per node_id
+// Sliding window: 30 requests per 60 seconds per node_id
 const WINDOW_SECONDS = 60;
-const MAX_REQUESTS = 5;
+const MAX_REQUESTS = 30;
 
 export async function rateLimitByNodeId(
   fastify: FastifyInstance,

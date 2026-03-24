@@ -1,9 +1,28 @@
 version: '3.9'
 
 # ── GroundTruth — Local Infrastructure ──────────────────────────────────────
-# PostgreSQL is hosted on Supabase — only Redis runs locally.
+# PostgreSQL and Redis run locally for development
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: groundtruth_postgres
+    environment:
+      POSTGRES_USER: groundtruth
+      POSTGRES_PASSWORD: groundtruth_password
+      POSTGRES_DB: groundtruth
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U groundtruth']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   redis:
     image: redis:7-alpine
     container_name: groundtruth_redis
@@ -29,5 +48,7 @@ services:
       start_period: 5s
 
 volumes:
+  postgres_data:
+    driver: local
   redis_data:
     driver: local

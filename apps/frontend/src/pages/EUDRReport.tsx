@@ -6,7 +6,7 @@ import { ComplianceGauge } from '../components/charts/ComplianceGauge.js';
 import { Spinner } from '../components/ui/Spinner.js';
 import { ErrorAlert } from '../components/ui/ErrorAlert.js';
 
-const DEMO_FARM_ID = '1';
+const DEMO_FARM_ID = '02d1a1f4-7da1-4b6c-a39c-f9826532b47f';
 const EXPLORER_BASE = 'https://explorer.solana.com/tx';
 
 export function EUDRReport() {
@@ -17,16 +17,22 @@ export function EUDRReport() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      complianceApi.getScore(DEMO_FARM_ID),
-      complianceApi.getProofChain(DEMO_FARM_ID),
-    ])
-      .then(([scoreData, proofData]) => {
-        setScore(scoreData);
-        setProofs(proofData);
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : t('errors.generic')))
-      .finally(() => setLoading(false));
+    const loadData = (isInitial = false) => {
+      if (isInitial) { setLoading(true); setError(null); }
+      Promise.all([
+        complianceApi.getScore(DEMO_FARM_ID),
+        complianceApi.getProofChain(DEMO_FARM_ID),
+      ])
+        .then(([scoreData, proofData]) => {
+          setScore(scoreData);
+          setProofs(proofData);
+        })
+        .catch((err: unknown) => { if (isInitial) setError(err instanceof Error ? err.message : t('errors.generic')); })
+        .finally(() => { if (isInitial) setLoading(false); });
+    };
+    loadData(true);
+    const interval = setInterval(() => loadData(false), 8000);
+    return () => clearInterval(interval);
   }, [t]);
 
   if (loading) return <Spinner size="lg" />;
@@ -40,19 +46,55 @@ export function EUDRReport() {
         ? 'text-warning'
         : 'text-error';
 
+  const generatedAt = new Date().toLocaleString('es', { dateStyle: 'long', timeStyle: 'short' });
+
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
+      {/* Screen header */}
+      <div className="print:hidden">
         <h1 className="text-2xl font-bold text-base-content">{t('nav.eudr')}</h1>
         <p className="text-sm text-base-content/50 mt-1">
           Reporte de cumplimiento EUDR — EU Deforestation Regulation 2023/1115
         </p>
       </div>
 
+      {/* PDF cover — only visible when printing */}
+      <div className="hidden print:block mb-8 border-b-2 border-gray-300 pb-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">GroundTruth · DePIN IoT on Solana</p>
+            <h1 className="text-3xl font-bold text-gray-900">Reporte de Cumplimiento EUDR</h1>
+            <p className="text-sm text-gray-500 mt-1">EU Deforestation Regulation 2023/1115</p>
+          </div>
+          <div className="text-right text-xs text-gray-400">
+            <p>Finca El Progreso — Antioquia, Colombia</p>
+            <p className="mt-1">Generado: {generatedAt}</p>
+            <p className="mt-1 font-mono">Farm: BwX9JyDJqGby…</p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+          <div className="border border-gray-200 rounded p-3">
+            <p className="text-3xl font-bold text-gray-900">{score?.score ?? 0}%</p>
+            <p className="text-xs text-gray-500 mt-1">Score de Compliance</p>
+          </div>
+          <div className="border border-gray-200 rounded p-3">
+            <p className="text-3xl font-bold text-gray-900">{score?.compliant_readings ?? 0}</p>
+            <p className="text-xs text-gray-500 mt-1">Lecturas conformes</p>
+          </div>
+          <div className="border border-gray-200 rounded p-3">
+            <p className={`text-3xl font-bold ${score?.level === 'COMPLIANT' ? 'text-green-600' : score?.level === 'WARNING' ? 'text-yellow-600' : 'text-red-600'}`}>
+              {score?.level === 'COMPLIANT' ? 'CONFORME' : score?.level === 'WARNING' ? 'ADVERTENCIA' : 'NO CONFORME'}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">Estado EUDR</p>
+          </div>
+        </div>
+      </div>
+
       {/* Score + parameters */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ComplianceGauge score={score} />
+        <div className="print:hidden">
+          <ComplianceGauge score={score} />
+        </div>
 
         <div className="lg:col-span-2 space-y-4">
           {/* Level banner */}
@@ -194,9 +236,9 @@ export function EUDRReport() {
         </div>
       </div>
 
-      {/* Download placeholder */}
-      <div className="flex justify-end">
-        <button className="btn btn-outline btn-sm gap-2">
+      {/* Generate PDF */}
+      <div className="flex justify-end print:hidden">
+        <button className="btn btn-outline btn-sm gap-2" onClick={() => window.print()}>
           <span>📄</span>
           {t('actions.generate_report')}
         </button>

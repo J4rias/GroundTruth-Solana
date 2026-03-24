@@ -45,7 +45,7 @@ function generateReading(): NodeReading {
     light_lux: noise(20000, 5000),       // 0–65535 lux
     co2_ppm: noise(650, 80),             // 400–2000 ppm — DeSci value
     battery_mv,                          // decreasing -1mV/reading (LiPo curve)
-    rssi_dbm: noise(-65, 6),             // -30 to -100 dBm
+    rssi_dbm: Math.round(noise(-65, 6)),  // -30 to -100 dBm
     uptime_seconds,
     timestamp,
   };
